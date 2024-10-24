@@ -35,6 +35,7 @@ def generate_household_data(df):
     )
     
     df_hh = add_no_children(df_hh,df)
+    df_hh = add_female_earner(df_hh,df)
     
     df_hh = df_hh.reset_index()
     return df_hh
@@ -46,3 +47,19 @@ def add_no_children(df_hh,df):
     """
     df_hh['no_children'] = df.groupby('household_id')['age'].apply(lambda x: (x<18).sum())
     return df_hh
+
+
+def add_female_earner(df_hh,df):
+    """
+    Add column indicating if highest earner is female.
+    """
+    df_hh['highest_earner_female'] = df.groupby('household_id').apply(highest_earner_female)
+    return df_hh
+
+
+def highest_earner_female(group):
+    """
+    Indicate if highest earner in group is female.
+    """
+    max_income_row = group.loc[group['income'].idxmax()]
+    return max_income_row['female']
